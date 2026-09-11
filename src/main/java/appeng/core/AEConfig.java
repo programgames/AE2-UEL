@@ -86,6 +86,9 @@ public final class AEConfig extends Configuration implements IConfigurableObject
     private boolean pinAutoCraftedItems = true;
     private boolean showPlacementPreview = true;
     private boolean showCellContentsPreview = true;
+    private boolean interfaceTerminalOnlyWithSpace = false;
+    private boolean interfaceTerminalOnlyCraftingMachines = false;
+    private boolean interfaceTerminalOnlyBrokenRecipes = false;
 
     // Spatial IO/Dimension
     private int storageProviderID = -1;
@@ -263,6 +266,9 @@ public final class AEConfig extends Configuration implements IConfigurableObject
         this.pinAutoCraftedItems = this.get("Client", "pinAutoCraftedItems", true, "Whether to pin items that the player auto-crafts to the first row of ME terminals.").getBoolean(true);
         this.showPlacementPreview = this.get("Client", "showPlacementPreview", true, "Whether to show a preview of part and facade placement.").getBoolean(true);
         this.showCellContentsPreview = this.get("Client", "showCellContentsPreview", true, "Whether to show a preview of cell contents in tooltips.").getBoolean(true);
+        this.interfaceTerminalOnlyWithSpace = this.get("Client", "interfaceTerminalOnlyWithSpace", false, "Remembered state of the Interface Terminal \"only show interfaces with free pattern slots\" filter.").getBoolean(false);
+        this.interfaceTerminalOnlyCraftingMachines = this.get("Client", "interfaceTerminalOnlyCraftingMachines", false, "Remembered state of the Interface Terminal \"only show interfaces attached to crafting machines\" filter.").getBoolean(false);
+        this.interfaceTerminalOnlyBrokenRecipes = this.get("Client", "interfaceTerminalOnlyBrokenRecipes", false, "Remembered state of the Interface Terminal \"only show interfaces with invalid patterns\" filter.").getBoolean(false);
 
         // load buttons..
         for (int btnNum = 0; btnNum < 4; btnNum++) {
@@ -530,6 +536,36 @@ public final class AEConfig extends Configuration implements IConfigurableObject
 
     public boolean showCellContentsPreview() {
         return showCellContentsPreview;
+    }
+
+    public boolean isInterfaceTerminalOnlyWithSpace() {
+        return this.interfaceTerminalOnlyWithSpace;
+    }
+
+    public void setInterfaceTerminalOnlyWithSpace(final boolean value) {
+        this.interfaceTerminalOnlyWithSpace = value;
+        this.get("Client", "interfaceTerminalOnlyWithSpace", false).set(value);
+        this.save();
+    }
+
+    public boolean isInterfaceTerminalOnlyCraftingMachines() {
+        return this.interfaceTerminalOnlyCraftingMachines;
+    }
+
+    public void setInterfaceTerminalOnlyCraftingMachines(final boolean value) {
+        this.interfaceTerminalOnlyCraftingMachines = value;
+        this.get("Client", "interfaceTerminalOnlyCraftingMachines", false).set(value);
+        this.save();
+    }
+
+    public boolean isInterfaceTerminalOnlyBrokenRecipes() {
+        return this.interfaceTerminalOnlyBrokenRecipes;
+    }
+
+    public void setInterfaceTerminalOnlyBrokenRecipes(final boolean value) {
+        this.interfaceTerminalOnlyBrokenRecipes = value;
+        this.get("Client", "interfaceTerminalOnlyBrokenRecipes", false).set(value);
+        this.save();
     }
 
     public boolean isDisableColoredCableRecipesInJEI() {
