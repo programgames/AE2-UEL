@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +46,8 @@ public final class PinnedKeys {
 
     private static final Map<IAEItemStack, PinInfo> pinned = new HashMap<IAEItemStack, PinInfo>(MAX_PINNED);
 
-    private static final Set<IAEItemStack> pendingJobs = new HashSet<IAEItemStack>(MAX_PINNED);
+    // Number of running jobs per key, so that a key stays pinned until its last job ends.
+    private static final Map<IAEItemStack, Integer> pendingJobs = new HashMap<IAEItemStack, Integer>(MAX_PINNED);
 
     private PinnedKeys() {
     }
@@ -74,12 +74,14 @@ public final class PinnedKeys {
         PinInfo info = pinned.get(key);
         if (info != null) {
             info.since = Instant.now();
+            // A new job revives a pin that was marked for removal when its previous job ended.
+            info.canPrune = false;
         } else {
             pinned.put(key.copy(), new PinInfo(reason));
         }
 
         if (reason == PinReason.CRAFTING) {
-            pendingJobs.add(key.copy());
+            pendingJobs.merge(key.copy(), 1, Integer::sum);
         }
 
         if (pinned.size() > MAX_PINNED) {
@@ -105,11 +107,11 @@ public final class PinnedKeys {
     }
 
     public static boolean hasPendingJob(IAEItemStack key) {
-        return pendingJobs.contains(key);
+        return pendingJobs.containsKey(key);
     }
 
     public static void markJobDone(IAEItemStack key) {
-        pendingJobs.remove(key);
+        pendingJobs.computeIfPresent(key, (k, count) -> count > 1 ? count - 1 : null);
     }
 
     public static void prune() {
